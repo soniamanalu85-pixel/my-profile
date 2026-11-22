@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CV Generator dengan Foto</title>
+  <style>
+    * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f1f5f9;
+      color: #0f172a;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .panel-form {
+      flex: 1;
+      min-width: 300px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .panel-cv {
+      flex: 1.3;
+      min-width: 320px;
+      background: #ffffff;
+      padding: 28px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    h2 { margin-top: 0; font-size: 18px; }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #94a3b8;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .btn-cetak {
+      margin-top: 16px;
+      width: 100%;
+      padding: 11px 16px;
+      background: #1d4ed8;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-cetak:hover { background: #1e40af; }
+
+    /* Header CV dengan Foto */
+    .cv-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+    }
+    .cv-foto {
+      width: 85px;
+      height: 85px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #94a3b8;
+      display: none; /* Muncul otomatis setelah foto dipilih */
+    }
+    .cv-nama {
+      margin: 0;
+      font-size: 22px;
+      text-transform: uppercase;
+    }
+    .cv-kontak {
+      margin: 5px 0 0;
+      font-size: 13px;
+      color: #334155;
+    }
+    .cv-bagian { margin-bottom: 14px; }
+    .cv-judul-bagian {
+      margin: 0 0 5px;
+      font-size: 13px;
+      text-transform: uppercase;
+      border-bottom: 1px solid #64748b;
+      padding-bottom: 2px;
+    }
+    .cv-isi {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+
+    @media print {
+      body { background: #ffffff; padding: 0; display: block; }
+      .panel-form, .no-print { display: none !important; }
+      .panel-cv { border: none; padding: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Bagian Kiri: Form Pengisian -->
+  <div class="panel-form">
+    <h2>Editor Data CV</h2>
+
+    <label for="fFoto">Foto Profil (Opsional)</label>
+    <input id="fFoto" type="file" accept="image/*" onchange="tampilkanFoto(event)" />
+
+    <label for="fNama">Nama Lengkap</label>
+    <input id="fNama" type="text" value="Sonia Trisanta Manalu" oninput="perbaruiCV()" />
+
+    <label for="fKontak">Domisili | No. HP | Email</label>
+    <input id="fKontak" type="text" value="Medan, Sumatera Utara | 08xx-xxxx-xxxx | email@contoh.com" oninput="perbaruiCV()" />
+
+    <label for="fRingkasan">Ringkasan Profil</label>
+    <textarea id="fRingkasan" rows="3" oninput="perbaruiCV()">Mahasiswa Sistem Informasi Bisnis dengan pengalaman PKL di bidang layanan pelanggan dan pengelolaan data administrasi.</textarea>
+
+    <label for="fPendidikan">Pendidikan</label>
+    <textarea id="fPendidikan" rows="2" oninput="perbaruiCV()">AMIK Universal Medan — Sistem Informasi Bisnis</textarea>
+
+    <label for="fPengalaman">Pengalaman PKL / Kerja</label>
+    <textarea id="fPengalaman" rows="4" oninput="perbaruiCV()">DPMPTSP Kabupaten Tapanuli Utara — Customer Service (PKL)
+- Memberikan informasi layanan dan membantu verifikasi berkas pemohon.</textarea>
+
+    <label for="fKeahlian">Keahlian</label>
+    <input id="fKeahlian" type="text" value="Customer Service, Administrasi Data, HTML, CSS, JavaScript Dasar" oninput="perbaruiCV()" />
+
+    <button class="btn-cetak no-print" type="button" onclick="cetakPDF()">
+      Cetak / Simpan sebagai PDF
+    </button>
+  </div>
+
+  <!-- Bagian Kanan: Pratinjau CV -->
+  <div class="panel-cv">
+    <div class="cv-header">
+      <img id="tFoto" class="cv-foto" alt="Foto Profil" />
+      <div>
+        <h1 class="cv-nama" id="tNama">SONIA TRISANTA MANALU</h1>
+        <div class="cv-kontak" id="tKontak">Medan, Sumatera Utara | 08xx-xxxx-xxxx | email@contoh.com</div>
+      </div>
+    </div>
+
+    <div class="cv-bagian">
+      <h3 class="cv-judul-bagian">Ringkasan</h3>
+      <p class="cv-isi" id="tRingkasan">Mahasiswa Sistem Informasi Bisnis dengan pengalaman PKL di bidang layanan pelanggan dan pengelolaan data administrasi.</p>
+    </div>
+
+    <div class="cv-bagian">
+      <h3 class="cv-judul-bagian">Pendidikan</h3>
+      <p class="cv-isi" id="tPendidikan">AMIK Universal Medan — Sistem Informasi Bisnis</p>
+    </div>
+
+    <div class="cv-bagian">
+      <h3 class="cv-judul-bagian">Pengalaman</h3>
+      <p class="cv-isi" id="tPengalaman">DPMPTSP Kabupaten Tapanuli Utara — Customer Service (PKL)
+- Memberikan informasi layanan dan membantu verifikasi berkas pemohon.</p>
+    </div>
+
+    <div class="cv-bagian">
+      <h3 class="cv-judul-bagian">Keahlian</h3>
+      <p class="cv-isi" id="tKeahlian">Customer Service, Administrasi Data, HTML, CSS, JavaScript Dasar</p>
+    </div>
+  </div>
+
+  <script>
+    function tampilkanFoto(event) {
+      const file = event.target.files[0];
+      const img = document.getElementById("tFoto");
+      if (file) {
+        img.src = URL.createObjectURL(file);
+        img.style.display = "block";
+      }
+    }
+
+    function perbaruiCV() {
+      document.getElementById("tNama").innerText = document.getElementById("fNama").value;
+      document.getElementById("tKontak").innerText = document.getElementById("fKontak").value;
+      document.getElementById("tRingkasan").innerText = document.getElementById("fRingkasan").value;
+      document.getElementById("tPendidikan").innerText = document.getElementById("fPendidikan").value;
+      document.getElementById("tPengalaman").innerText = document.getElementById("fPengalaman").value;
+      document.getElementById("tKeahlian").innerText = document.getElementById("fKeahlian").value;
+    }
+
+    function cetakPDF() {
+      perbaruiCV();
+      window.print();
+    }
+  </script>
+</body>
+</html>
